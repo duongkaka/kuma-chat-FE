@@ -1,0 +1,35 @@
+@import 'normalize.css';
+/* Importing Noto Sans JP (Modern) and Shippori Mincho (Elegant Serif) */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&family=Shippori+Mincho:wght@400;700&display=swap');
+
+:root {
+    --font-main: 'Noto Sans JP', sans-serif;
+    --font-elegant: 'Shippori Mincho', serif;
+    /* --- THEME: MODERN LIGHT (Phù hợp ứng dụng Chat) --- */
+    --primary-color: #007aff; /* Xanh iMessage - Nổi bật trên nền trắng */
+    --bg-color: #f5f7fb; /* Xám xanh nhạt - Giảm mỏi mắt hơn trắng tinh */
+
+    /* Màu phụ trợ */
+    --chat-bubble-me: var(--primary-color);
+    --chat-bubble-them: #ffffff;
+    --text-main: #2c3e50;
+    --text-muted: #7f8c8d;
+}
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+body {
+    font-family: var(--font-main);
+    /* Japanese text looks better with slightly increased line height */
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+}
+
+h1,
+.traditional-style {
+    font-family: var(--font-elegant);
+}
