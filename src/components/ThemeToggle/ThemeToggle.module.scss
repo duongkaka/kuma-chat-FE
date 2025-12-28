@@ -1,0 +1,84 @@
+.theme-slider {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+
+    /* đặt trong header cho đẹp */
+    padding: 4px 6px;
+    border-radius: 8px;
+    transition: background 0.3s ease;
+    height: 60px;
+}
+
+/* icon chung */
+.icon {
+    font-size: 15px;
+    transition:
+        color 0.3s ease,
+        transform 0.2s ease;
+}
+
+/* icon mặt trăng */
+.moon {
+    color: #94a3b8; // xám xanh
+}
+
+/* icon mặt trời */
+.sun {
+    color: #f59e0b; // cam vàng
+}
+
+/* Dark mode */
+:global(html[data-theme='dark']) {
+    .theme-slider {
+        &:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+    }
+
+    .moon {
+        color: #e5e7eb;
+    }
+
+    .sun {
+        color: #facc15;
+    }
+}
+
+// /* Tùy chỉnh MUI Switch */
+// :global(.MuiSwitch-root) {
+//     width: 42px;
+//     height: 24px;
+//     padding: 0;
+
+//     .MuiSwitch-switchBase {
+//         padding: 2px;
+
+//         &.Mui-checked {
+//             transform: translateX(18px);
+//         }
+//     }
+
+//     .MuiSwitch-thumb {
+//         width: 20px;
+//         height: 20px;
+//         background-color: #ffffff;
+//         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+//     }
+
+//     .MuiSwitch-track {
+//         border-radius: 999px;
+//         background-color: #e5e7eb;
+//         opacity: 1;
+//     }
+// }
+
+// /* Dark mode cho Switch */
+// :global(html[data-theme='dark']) {
+//     .MuiSwitch-track {
+//         background-color: #334155;
+//     }
+// }
