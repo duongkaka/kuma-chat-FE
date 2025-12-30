@@ -23,9 +23,10 @@ function Header() {
             <div className={cx('inner')}>
                 {/* Logo */}
                 <Tippy theme="light" content="Home" placement="bottom" arrow={true} delay={100} asChild>
-                    <Link to={'/'} className={cx('logo')}>
+                    {/* <Link to={'/'} className={cx('logo')}>
                         <img src={images.logo} alt="Logo" />
-                    </Link>
+                    </Link> */}
+                    <div className={cx('chatTitle')}> KUMA Chat Web</div>
                 </Tippy>
 
                 {login ? (
@@ -41,7 +42,8 @@ function Header() {
                         {/* Logout */}
                         <Tippy theme="light" content="Logout" placement="bottom" arrow={true} delay={100}>
                             <Button className={cx('logout-btn')}>
-                                <FontAwesomeIcon icon={faSignOut} />
+                                {/* <FontAwesomeIcon icon={faSignOut} /> */}
+                                ログアウト
                             </Button>
                         </Tippy>
                     </div>

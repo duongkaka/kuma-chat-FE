@@ -1,4 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600&display=swap');
+// Logo
+.chatTitle {
+    font-family: 'Dancing Script', cursive;
+    font-size: 36px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 1px;
+}
 .header {
+    background-color: var(--bg-main);
     height: 60px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }

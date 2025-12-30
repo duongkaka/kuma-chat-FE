@@ -3,18 +3,73 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&family=Shippori+Mincho:wght@400;700&display=swap');
 
 :root {
+    /* ================= FONT ================= */
     --font-main: 'Noto Sans JP', sans-serif;
     --font-elegant: 'Shippori Mincho', serif;
-    /* --- THEME: MODERN LIGHT (Phù hợp ứng dụng Chat) --- */
-    --primary-color: #fdba74; /* Xanh iMessage - Nổi bật trên nền trắng */
-    --bg-color: #f5f7fb; /* Xám xanh nhạt - Giảm mỏi mắt hơn trắng tinh */
 
-    /* Màu phụ trợ */
-    --chat-bubble-me: var(--primary-color);
-    --chat-bubble-them: #ffffff;
-    --text-main: #2c3e50;
-    --text-muted: #7f8c8d;
+    /* ================= LIGHT THEME ================= */
+
+    /* Background */
+    --bg-main: #f5f7fb;
+    --bg-secondary: #ffffff;
+    --bg-sidebar: #f8f9fa;
+    --bg-card: #ffffff;
+    --bg-hover: #eef2ff;
+
+    /* Text */
+    --text-main: #1f2937;
+    --text-secondary: #374151;
+    --text-muted: #6b7280;
+    --text-inverse: #ffffff;
+
+    /* Brand / Action */
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    --success: #16a34a;
+    --warning: #f59e0b;
+    --error: #dc2626;
+
+    /* Border & Divider */
+    --border-color: #e5e7eb;
+    --divider: #f1f5f9;
+
+    /* Shadow */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.08);
 }
+
+[data-theme='dark'] {
+    /* ================= DARK THEME ================= */
+
+    /* Background */
+    --bg-main: #0f172a;
+    --bg-secondary: #020617;
+    --bg-sidebar: #181818;
+    --bg-card: #020617;
+    --bg-hover: #1e293b;
+
+    /* Text */
+    --text-main: #e5e7eb;
+    --text-secondary: #cbd5f5;
+    --text-muted: #94a3b8;
+    --text-inverse: #020617;
+
+    /* Brand / Action */
+    --primary: #6366f1;
+    --primary-hover: #818cf8;
+    --success: #22c55e;
+    --warning: #fbbf24;
+    --error: #ef4444;
+
+    /* Border & Divider */
+    --border-color: #2c2c2c;
+    --divider: #1e293b;
+
+    /* Shadow */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -25,7 +80,7 @@ body {
     /* Japanese text looks better with slightly increased line height */
     line-height: 1.75;
     -webkit-font-smoothing: antialiased;
-    background-color: var(--bg-color);
+    background-color: var(--bg-main);
     color: var(--text-main);
 }
 

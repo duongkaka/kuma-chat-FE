@@ -1,0 +1,31 @@
+.theme-slider {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+
+    /* đặt trong header cho đẹp */
+    padding: 4px 6px;
+    border-radius: 8px;
+    transition: background 0.3s ease;
+}
+
+/* icon chung */
+.icon {
+    font-size: 26px;
+    transition:
+        color 0.3s ease,
+        transform 0.2s ease;
+}
+
+/* icon mặt trăng */
+.moon {
+    color: #94a3b8; // xám xanh
+}
+
+/* icon mặt trời */
+.sun {
+    color: #f59e0b; // cam vàng
+}
