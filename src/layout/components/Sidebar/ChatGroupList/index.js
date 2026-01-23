@@ -2,49 +2,53 @@ import classNames from 'classnames/bind';
 import styles from './ChatGroupList.module.scss';
 import { faSun, faMoon } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useEffect, useState } from 'react';
+
 import { Switch, Box } from '@mui/material';
 import ChatItem from '../../ChatItem';
+import { useEffect, useState } from 'react';
+import { getMessages, getMyGroupConversations } from '~/services/chatService';
+import { useConversation } from '~/context/ConversationContext';
 
 const cx = classNames.bind(styles);
+
 // API fake
-const fakeConversations = [
-    {
-        id: 1,
-        name: 'Frontend Team',
-        avatar: 'https://i.pravatar.cc/150?img=1',
-        lastMessage: 'Hoàn thành UI chưa?',
-        isRead: true,
-    },
-    {
-        id: 2,
-        name: 'Backend Team',
-        avatar: 'https://i.pravatar.cc/150?img=2',
-        lastMessage: 'API đã deploy xong',
-        isRead: false,
-    },
-    {
-        id: 3,
-        name: 'UI/UX Team',
-        avatar: 'https://i.pravatar.cc/150?img=3',
-        lastMessage: 'Check lại màu dark mode nhé, sao mai chưa xong vây?????',
-        isRead: true,
-    },
-    {
-        id: 4,
-        name: 'Mobile Team',
-        avatar: 'https://i.pravatar.cc/150?img=4',
-        lastMessage: 'Build iOS bị lỗi',
-        isRead: false,
-    },
-];
 
 function ChatGroupList() {
+    const [conversations, setConversations] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [messagesMap, setMessagesMap] = useState({});
+    const { setSelectedConversationId } = useConversation();
+
+    const fetchGroupConversations = async () => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const response = await getMyGroupConversations();
+            const convs = response?.data?.result || [];
+            setConversations(convs);
+            // ✅ Nếu có conversation, tự động chọn cái đầu tiên
+        } catch (error) {
+            setError('Failed to load conversations. Please try again later.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchGroupConversations();
+    }, []);
+
     return (
         <div className={cx('section')}>
             <ul className={cx('list')}>
-                {fakeConversations.map((conversation) => (
-                    <li className={cx('item')} key={conversation.id}>
+                {conversations.map((conversation) => (
+                    <li
+                        className={cx('item')}
+                        key={conversation.id}
+                        onClick={() => setSelectedConversationId(conversation.id)}
+                    >
                         <ChatItem conversation={conversation} />
                     </li>
                 ))}

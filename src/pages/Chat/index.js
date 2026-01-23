@@ -1,37 +1,50 @@
-import { Box, IconButton, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import style from './Chat.module.scss';
 import classNames from 'classnames/bind';
-import AddIcon from '@mui/icons-material/Add';
 import NewChatPopover from '~/layout/components/NewChatPopover';
+import { useEffect, useState } from 'react';
+import { getMessages } from '~/services/chatService';
+import { useConversation } from '~/context/ConversationContext';
 const cx = classNames.bind(style);
-const fakeChatMessages = [
-    {
-        id: 1,
-        senderName: 'Nguyễn Văn A',
-        avatar: 'https://i.pravatar.cc/150?img=1',
-        message: 'Chào bạn, bạn khỏe không?',
-        isMe: false,
-    },
-    {
-        id: 2,
-        senderName: 'Trần Thị B',
-        avatar: 'https://i.pravatar.cc/150?img=2',
-        message: 'Mình khỏe, còn bạn thì sao?',
-        isMe: true,
-    },
-    {
-        id: 3,
-        senderName: 'Nguyễn Văn A',
-        avatar: 'https://i.pravatar.cc/150?img=1',
-        message: 'Mình cũng ổn, đang làm project React.',
-        isMe: false,
-    },
-];
 
 function Chat() {
+    const { selectedConversationId } = useConversation();
+    const [messagesMap, setMessagesMap] = useState({});
+
+    // console.log('conversationID : ' + selectedConversationId);
+
+    useEffect(() => {
+        const fetchMessages = async (selectedConversationId) => {
+            if (!messagesMap[selectedConversationId]) {
+                try {
+                    const response = await getMessages(selectedConversationId);
+                    if (response?.data?.result) {
+                        const sortedMessages = [...response.data.result].sort(
+                            (a, b) => new Date(a.createdDate) - new Date(b.createdDate),
+                        );
+                        setMessagesMap((prev) => ({
+                            ...prev,
+                            [selectedConversationId]: sortedMessages,
+                        }));
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+        };
+
+        fetchMessages(selectedConversationId);
+    }, [selectedConversationId, messagesMap]);
+
+    const currentMessages = selectedConversationId ? messagesMap[selectedConversationId] || [] : [];
+
     return (
-        <Box>
-            <NewChatPopover messages={fakeChatMessages} />
+        <Box className={cx('chat-container')}>
+            {selectedConversationId ? (
+                <NewChatPopover messages={currentMessages} />
+            ) : (
+                <Box sx={{ padding: 2 }}>Chọn một cuộc trò chuyện để bắt đầu chat</Box>
+            )}
         </Box>
     );
 }

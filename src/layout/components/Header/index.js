@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import style from './Header.module.scss';
 import classNames from 'classnames/bind';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import images from '~/assets/images';
 import Image from '~/components/Image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -10,6 +10,8 @@ import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css'; // CSS mặc định
 import 'tippy.js/themes/light.css';
 import Button from '~/components/Button';
+import { logout } from '~/services/login';
+import { isLoggedIn } from '~/services/localStorageService';
 
 const cx = classNames.bind(style);
 
@@ -17,7 +19,14 @@ function Header() {
     // Login
     const login = useState(true)[0];
     const ForwardedImage = React.forwardRef((props, ref) => <Image {...props} ref={ref} />);
-
+    const navigate = useNavigate();
+    const handleLogout = () => {
+        logout();
+        navigate('/logout');
+    };
+    const handleRegistration = () => {
+        navigate('/registration');
+    };
     return (
         <header className={cx('header')}>
             <div className={cx('inner')}>
@@ -29,7 +38,7 @@ function Header() {
                     <div className={cx('chatTitle')}> KUMA Chat Web</div>
                 </Tippy>
 
-                {login ? (
+                {isLoggedIn() ? (
                     <div className={cx('actions')}>
                         {/* Profile */}
                         <Tippy theme="light" content="Profile" placement="bottom" arrow={true} delay={100} asChild>
@@ -41,16 +50,23 @@ function Header() {
                         </Tippy>
                         {/* Logout */}
                         <Tippy theme="light" content="Logout" placement="bottom" arrow={true} delay={100}>
-                            <Button className={cx('logout-btn')}>
-                                {/* <FontAwesomeIcon icon={faSignOut} /> */}
-                                ログアウト
+                            <Button className={cx('logout-btn')} onClick={handleLogout}>
+                                <FontAwesomeIcon icon={faSignOut} />
+                                {/* ログアウト */}
                             </Button>
                         </Tippy>
                     </div>
                 ) : (
                     <div className={cx('actions')}>
                         <Tippy theme="light" content="登録" placement="bottom" arrow={true} delay={100}>
-                            <Button primary outline text className={cx('action-btn')}>
+                            <Button
+                                onClick={handleRegistration}
+                                small
+                                primary
+                                outline
+                                text
+                                className={cx('action-btn')}
+                            >
                                 登 録
                             </Button>
                         </Tippy>

@@ -5,51 +5,47 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { Switch, Box } from '@mui/material';
 import ChatItem from '../../ChatItem';
+import { getMyPrivateConversations } from '~/services/chatService';
+import { useConversation } from '~/context/ConversationContext';
 
 const cx = classNames.bind(styles);
 
 function PrivateChatList() {
-    // fakePersonalChats.js
-    const fakePersonalChats = [
-        {
-            id: 1,
-            name: 'Alice Nguyen',
-            avatar: 'https://i.pravatar.cc/150?img=5',
-            lastMessage: 'Hey, tối nay đi xem phim không?',
-            isRead: false,
-            timestamp: '2025-12-29T10:15:00', // ISO string
-        },
-        {
-            id: 2,
-            name: 'Bob Tran',
-            avatar: 'https://i.pravatar.cc/150?img=6',
-            lastMessage: 'Mình đã gửi file báo cáo nhé.',
-            isRead: true,
-            timestamp: '2025-12-28T14:45:00',
-        },
-        {
-            id: 3,
-            name: 'Charlie Le',
-            avatar: 'https://i.pravatar.cc/150?img=7',
-            lastMessage: 'Sáng mai có họp zoom không?',
-            isRead: false,
-            timestamp: '2025-12-29T08:30:00',
-        },
-        {
-            id: 4,
-            name: 'Diana Pham',
-            avatar: 'https://i.pravatar.cc/150?img=8',
-            lastMessage: 'Cập nhật lại project nhé.',
-            isRead: true,
-            timestamp: '2025-12-27T18:20:00',
-        },
-    ];
+    const [conversations, setConversations] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [messagesMap, setMessagesMap] = useState({});
+    const { setSelectedConversationId } = useConversation();
+    const fetchPrivateConversations = async () => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const response = await getMyPrivateConversations();
+            const convs = response?.data?.result || [];
+            setConversations(convs);
+            console.log(convs);
+
+            // ✅ Nếu có conversation, tự động chọn cái đầu tiên
+        } catch (error) {
+            setError('Failed to load conversations. Please try again later.');
+        } finally {
+            setLoading(false);
+        }
+    };
+    useEffect(() => {
+        fetchPrivateConversations();
+    }, []);
 
     return (
         <div className={cx('section')}>
             <ul className={cx('list')}>
-                {fakePersonalChats.map((conversation) => (
-                    <li className={cx('item')} key={conversation.id}>
+                {conversations.map((conversation) => (
+                    <li
+                        className={cx('item')}
+                        key={conversation.id}
+                        onClick={() => setSelectedConversationId(conversation.id)}
+                    >
                         <ChatItem conversation={conversation} />
                     </li>
                 ))}

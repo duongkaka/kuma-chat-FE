@@ -1,0 +1,134 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.dialog {
+    background: #fff;
+    width: 420px;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.title {
+    margin-bottom: 16px;
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* ================= INPUT ================= */
+.input {
+    width: 100%;
+    padding: 8px 10px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+
+    &:focus {
+        outline: none;
+        border-color: #1976d2;
+    }
+}
+
+/* ================= AVATAR ================= */
+.avatarPreview {
+    width: 80px;
+    height: 80px;
+    margin: 8px 0;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #ddd;
+}
+
+/* ================= USER SEARCH ================= */
+.userList {
+    max-height: 160px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    background: #fff;
+
+    li {
+        padding: 8px 10px;
+        cursor: pointer;
+        font-size: 14px;
+
+        &:hover {
+            background: #f0f7ff;
+        }
+    }
+}
+
+/* ================= PARTICIPANTS ================= */
+.participantList {
+    margin-top: 8px;
+}
+
+.participantList li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f5f5f5;
+    padding: 6px 8px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+    font-size: 13px;
+}
+
+.remove {
+    cursor: pointer;
+    color: #e53935;
+    font-weight: bold;
+
+    &:hover {
+        color: #b71c1c;
+    }
+}
+
+/* ================= ACTIONS ================= */
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.cancel {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: #555;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.submit {
+    background: #1976d2;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+
+    &:hover {
+        background: #1565c0;
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}

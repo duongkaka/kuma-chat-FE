@@ -24,16 +24,21 @@ import {
     TextField,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
+import CreateGroupChatDialog from '~/components/CreateGroupChatDialog';
+import CreatePrivateChatDialog from '~/components/CreatePrivateChatDialog';
 
 const cx = classNames.bind(style);
 
-function Sidebar() {
+function Sidebar({ setSelectedConversation }) {
+    const [openCreateGroup, setOpenCreateGroup] = useState(false);
+    const [openCreatePrivate, setOpenCreatePrivate] = useState(false);
     const [groupName, setGroupName] = useState('');
     const [search, setSearch] = useState('');
     const [users, setUsers] = useState([]);
 
     const [selectedUsers, setSelectedUsers] = useState([]);
     const [loading, setLoading] = useState(false);
+
     // 🔍 Debounce search
     useEffect(() => {
         if (!search.trim()) {
@@ -58,25 +63,6 @@ function Sidebar() {
     const removeUser = (userId) => {
         setSelectedUsers(selectedUsers.filter((u) => u.id !== userId));
     };
-    const handleCreateGroup = () => {
-        if (!groupName.trim()) {
-            alert('グループ名を入力してください');
-            return;
-        }
-
-        if (selectedUsers.length === 0) {
-            alert('メンバーを選択してください');
-            return;
-        }
-
-        const payload = {
-            name: groupName,
-            members: selectedUsers.map((u) => u.id),
-        };
-
-        console.log('Create Group:', payload);
-        handleClose();
-    };
 
     const fetchUsers = async () => {
         try {
@@ -98,6 +84,16 @@ function Sidebar() {
         setSelectedUsers((prev) => (prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]));
     };
 
+    const handleRefreshGroups = () => {
+        // trigger reload group list
+        // ví dụ dùng context hoặc callback
+    };
+
+    const handleRefreshPrivates = () => {
+        // trigger reload private list
+        // ví dụ dùng context hoặc callback
+    };
+
     const [open, setOpen] = useState(false);
 
     const handleOpen = () => setOpen(true);
@@ -109,81 +105,50 @@ function Sidebar() {
             <div className={cx('top')}>
                 <ThemeToggle />
             </div>
-            {/* Chat content */}
+
             <div className={cx('content')}>
+                {/* Group Chat */}
                 <div className={cx('group-chat-wrapper')}>
                     <div className={cx('chat-header')}>
                         <div className={cx('title')}>Group Chat</div>
                         <Tippy theme="light" content="グループチャット作成" placement="bottom" arrow={true} delay={100}>
-                            <Button variant="outlined">
+                            <Button variant="outlined" onClick={() => setOpenCreateGroup(true)}>
                                 {' '}
                                 <FontAwesomeIcon icon={faPlus} className={cx('icon')} />
                             </Button>
                         </Tippy>
                     </div>
-                    <ChatGroupList />
+                    <ChatGroupList setSelectedConversation={setSelectedConversation} />
                 </div>
+                {/* Private Chat */}
                 <div className={cx('private-chat-wrapper')}>
                     {/* Title */}
                     <div className={cx('chat-header')}>
                         <div className={cx('title')}>Private Chat</div>
                         <Tippy theme="light" content="チャット作成" placement="bottom" arrow={true} delay={100}>
-                            <Button variant="outlined" onClick={handleOpen}>
+                            <Button variant="outlined" onClick={() => setOpenCreatePrivate(true)}>
                                 {' '}
                                 <FontAwesomeIcon icon={faPlus} className={cx('icon')} />
                             </Button>
                         </Tippy>
                     </div>
                     {/* Private Chat */}
-                    <PrivateChatList />
+                    <PrivateChatList setSelectedConversation={setSelectedConversation} />
                 </div>
             </div>
             {/* Dialog */}
-            <Dialog open={open} onClose={handleClose}>
-                <DialogTitle>グループチャット作成</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        label="グループ名"
-                        fullWidth
-                        margin="normal"
-                        value={groupName}
-                        onChange={(e) => setGroupName(e.target.value)}
-                    />
-                    {/* 🔍 Search user */}
-                    <TextField
-                        label="メンバー検索"
-                        fullWidth
-                        margin="normal"
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                    />
-                    {loading && <CircularProgress size={20} />}
-                    {/* 🔽 Search result */}
+            <CreateGroupChatDialog
+                open={openCreateGroup}
+                onClose={() => setOpenCreateGroup(false)}
+                onSuccess={handleRefreshGroups}
+            />
 
-                    <List>
-                        {users.map((user) => (
-                            <ListItem button key={user.id} onClick={() => addUser(user)}>
-                                <ListItemText primary={user.name} secondary={user.email} />
-                            </ListItem>
-                        ))}
-                    </List>
-                    {/* ✅ Selected users */}
-                    {selectedUsers.map((user) => (
-                        <Chip
-                            key={user.id}
-                            label={user.name}
-                            onDelete={() => removeUser(user.id)}
-                            sx={{ mr: 1, mb: 1 }}
-                        />
-                    ))}
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose}>キャンセル</Button>
-                    <Button variant="contained" color="primary">
-                        作成
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            {/* Dialog */}
+            <CreatePrivateChatDialog
+                open={openCreatePrivate}
+                onClose={() => setOpenCreatePrivate(false)}
+                onSuccess={handleRefreshPrivates}
+            />
         </aside>
     );
 }
