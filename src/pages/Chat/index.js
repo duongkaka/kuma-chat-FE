@@ -17,6 +17,7 @@ function Chat() {
         const fetchMessages = async (selectedConversationId) => {
             if (!messagesMap[selectedConversationId]) {
                 try {
+                    if (!selectedConversationId) return;
                     const response = await getMessages(selectedConversationId);
                     if (response?.data?.result) {
                         const sortedMessages = [...response.data.result].sort(

@@ -13,3 +13,10 @@ export const searchUsers = async (search) => {
         },
     });
 };
+
+export const getMyProfile = async () => {
+    const response = await httpClient.get(`${API.MY_PROFILE}`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+    });
+    return response.data;
+};

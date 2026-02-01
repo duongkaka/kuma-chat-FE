@@ -6,6 +6,7 @@ import HeaderOnly from './layout/HeaderOnly';
 import { isLoggedIn } from './services/localStorageService';
 import { Login } from '@mui/icons-material';
 import { ConversationProvider } from './context/ConversationContext';
+import { AuthProvider } from './context/AuthContext';
 function App() {
     return (
         <div className="App">
@@ -37,11 +38,13 @@ function App() {
                             path={route.path}
                             element={
                                 isLoggedIn() ? (
-                                    <ConversationProvider>
-                                        <Layout>
-                                            <Page />
-                                        </Layout>
-                                    </ConversationProvider>
+                                    <AuthProvider>
+                                        <ConversationProvider>
+                                            <Layout>
+                                                <Page />
+                                            </Layout>
+                                        </ConversationProvider>
+                                    </AuthProvider>
                                 ) : (
                                     <Navigate to="/login" replace />
                                 )

@@ -1,118 +1,163 @@
-import { Box, IconButton, Typography, Popover, Avatar, TextField } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
+import { Box, IconButton, Typography, Avatar, TextField } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
-import { useEffect, useState } from 'react';
-import { TextFields } from '@mui/icons-material';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { sendMessage } from '~/services/messages';
 import { useConversation } from '~/context/ConversationContext';
 import { io } from 'socket.io-client';
 import { getToken } from '~/services/localStorageService';
+import { useAuth } from '~/context/AuthContext';
 
 function NewChatPopover({ messages }) {
+    const { myInfo } = useAuth();
+    const [messagesList, setMessagesList] = useState([]);
     const [message, setMessage] = useState('');
     const { selectedConversationId } = useConversation();
+    const socketRef = useRef(null);
+    const messageContainerRef = useRef(null);
 
-    // Web socket message sending
-    useEffect(() => {
-        const socket = new io('http://localhost:8099', {
-            auth: {
-                token: getToken(),
-            },
-        });
-        // Kết nối WebSocket
-        socket.on('connect', () => {
-            console.log('WebSocket connected', socket.id);
-        });
-        // Nhận tin nhắn từ WebSocket
-        socket.on('message', (message) => {
-            console.log('Received message:', message);
-        });
-        // Xử lý khi kết nối đóng
-        socket.on('disconnect', () => {
-            console.log('WebSocket disconnected');
-        });
-        // cleanup function
-        return () => {
-            console.log('Disconnecting socket');
-
-            socket.disconnect();
-        };
+    const scrollToBottom = useCallback(() => {
+        if (messageContainerRef.current) {
+            messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
+        }
     }, []);
 
+    // 1. Cập nhật danh sách khi đổi hội thoại hoặc nhận tin nhắn mới
+    const handleIncomingMessage = useCallback((incomingData) => {
+        setMessagesList((prev) => {
+            // Kiểm tra trùng lặp dựa trên messageId (tên biến từ Java Backend)
+            const isExisted = prev.some((m) => (m.id || m.messageId) === (incomingData.id || incomingData.messageId));
+            if (isExisted) return prev;
+
+            const newList = [...prev, incomingData].sort(
+                (a, b) => new Date(a.createdAt || a.createdDate) - new Date(b.createdAt || b.createdDate),
+            );
+            return newList;
+        });
+    }, []);
+
+    // 2. Đồng bộ props messages từ ngoài vào
     useEffect(() => {
-        // Scroll to bottom when messages change
-        const chatContainer = document.getElementById('chat-container');
-        if (chatContainer) {
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+        if (Array.isArray(messages)) {
+            setMessagesList(messages);
+        } else if (messages && selectedConversationId) {
+            setMessagesList(messages[selectedConversationId] || []);
         }
-    }, [messages]);
-    const handleSendMessage = async () => {
-        if (!message.trim()) return;
+    }, [messages, selectedConversationId]);
+
+    // 3. Quản lý WebSocket
+    useEffect(() => {
+        if (!selectedConversationId) return;
+
+        socketRef.current = io('http://localhost:8099', {
+            query: { token: getToken() },
+        });
+
+        socketRef.current.on('message', (data) => {
+            console.log('Dữ liệu thô từ Socket:', data);
+
+            // Tự động parse nếu backend gửi String
+            const parsedData = typeof data === 'string' ? JSON.parse(data) : data;
+
+            if (parsedData.conversationId === selectedConversationId) {
+                handleIncomingMessage(parsedData);
+            }
+        });
+
+        return () => {
+            if (socketRef.current) socketRef.current.disconnect();
+        };
+    }, [selectedConversationId, handleIncomingMessage]);
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messagesList, scrollToBottom]);
+
+    const handleSendMessage = async (e) => {
+        if (e) e.preventDefault();
+        if (!message.trim() || !selectedConversationId) return;
+
+        const currentMsgText = message;
+        const userId = myInfo?.result?.userId;
+
+        // Optimistic UI
+        const tempMessage = {
+            messageId: Date.now(), // Tạm thời dùng làm key
+            content: currentMsgText,
+            senderId: userId,
+            avatar: myInfo?.result?.avatar,
+            userProfileResponse: { nickname: myInfo?.result?.nickname },
+            createdAt: new Date().toISOString(),
+            conversationId: selectedConversationId,
+        };
+
+        setMessagesList((prev) => [...prev, tempMessage]);
+        setMessage('');
 
         try {
-            await sendMessage(selectedConversationId, message);
-            console.log('Message sent successfully', selectedConversationId);
-            setMessage('');
+            // Gửi API (Backend của bạn sẽ lo việc gửi Socket cho đối phương)
+            await sendMessage(selectedConversationId, currentMsgText);
         } catch (error) {
-            console.error('Send message failed', error);
+            console.error('Lỗi gửi tin nhắn:', error);
         }
     };
 
     return (
         <Box display="flex" flexDirection="column" height={540}>
-            {/* Chat content */}
-            <Box p={2} flex={1} gap={2} overflow="auto">
-                <Box display="flex" flexDirection="column" gap={2}>
-                    {messages.map((msg) => (
+            <Box
+                ref={messageContainerRef}
+                p={2}
+                flex={1}
+                sx={{ overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}
+            >
+                {messagesList.map((msg) => {
+                    const isMe = myInfo && msg.senderId === myInfo.result.userId;
+                    return (
                         <Box
-                            key={msg.id}
+                            key={msg.id || msg.messageId}
                             display="flex"
                             gap={1}
+                            flexDirection={isMe ? 'row-reverse' : 'row'}
                             alignItems="flex-start"
-                            flexDirection={msg.isMe ? 'row-reverse' : 'row'}
                         >
-                            <Avatar src={msg.avatar} />
-
+                            <Avatar src={msg.avatar} sx={{ width: 32, height: 32 }} />
                             <Box
                                 sx={{
-                                    backgroundColor: msg.isMe ? '#DCF8C6' : '#F1F1F1',
+                                    backgroundColor: isMe ? '#DCF8C6' : '#F1F1F1',
                                     borderRadius: 2,
                                     padding: '8px 12px',
                                     maxWidth: '70%',
                                 }}
                             >
-                                <Typography variant="subtitle2">{msg.userProfileResponse.nickname}</Typography>
+                                {!isMe && (
+                                    <Typography sx={{ fontWeight: 800, fontSize: '0.75rem' }}>
+                                        {msg.userProfileResponse?.nickname}
+                                    </Typography>
+                                )}
                                 <Typography variant="body2">{msg.content}</Typography>
                             </Box>
                         </Box>
-                    ))}
-                </Box>
+                    );
+                })}
             </Box>
-            {/* Send Chat */}
+
             <Box
                 component="form"
-                sx={{
-                    p: 2,
-                    borderTop: 1,
-                    borderColor: 'divider',
-                    display: 'flex',
-                    flexShrink: 0,
-                }}
-                onSubmit={(e) => {
-                    e.preventDefault();
-                    //handleSendMessage();
-                }}
+                sx={{ p: 2, borderTop: 1, borderColor: 'divider', display: 'flex' }}
+                onSubmit={handleSendMessage}
             >
                 <TextField
                     fullWidth
-                    placeholder="チャット"
-                    variant="outlined"
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     size="small"
                     multiline
-                    minRows={1}
                     maxRows={4}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            handleSendMessage();
+                        }
+                    }}
                 />
                 <IconButton color="primary" sx={{ ml: 1 }} disabled={!message.trim()} onClick={handleSendMessage}>
                     <SendIcon />

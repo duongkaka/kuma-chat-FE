@@ -13,4 +13,5 @@ export const API = {
     CREATE_PRIVATE_CONVERSATION: '/conversations/create-private-conversation',
     SEARCH_USER: '/users/search/',
     SEND_MESSAGE: '/messages/send',
+    MY_PROFILE: '/users/myInfo',
 };

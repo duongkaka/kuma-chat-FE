@@ -2,6 +2,7 @@ import classNames from 'classnames/bind';
 import style from './Button.module.scss';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
+import { forwardRef } from 'react';
 const cx = classNames.bind(style);
 
 function Button({
@@ -55,13 +56,15 @@ function Button({
         large,
     });
 
-    return (
-        <Comp className={classes} {...props}>
-            {leftIcon && <span className={cx('icon')}>{leftIcon}</span>}
-            <span className={cx('title')}>{children}</span>
-            {rightIcon && <span className={cx('icon')}>{rightIcon}</span>}
-        </Comp>
-    );
+    const Button = forwardRef(({ children, ...props }, ref) => {
+        return (
+            <Comp ref={ref} className={classes} {...props}>
+                {leftIcon && <span className={cx('icon')}>{leftIcon}</span>}
+                <span className={cx('title')}>{children}</span>
+                {rightIcon && <span className={cx('icon')}>{rightIcon}</span>}
+            </Comp>
+        );
+    });
 }
 
 Button.propTypes = {
